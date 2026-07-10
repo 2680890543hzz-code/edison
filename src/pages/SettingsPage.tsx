@@ -10,13 +10,13 @@ import { useState } from 'react';
 
 const PROVIDER_OPTIONS: { value: AIProviderType; label: string; icon: string }[] = [
   { value: 'claude', label: 'Claude (Anthropic)', icon: '🧠' },
-  { value: 'openai', label: 'OpenAI (含兼容API)', icon: '🤖' },
-  { value: 'ollama', label: 'Ollama (本地模型)', icon: '💻' },
+  { value: 'openai', label: 'OpenAI（兼容 DeepSeek 等）', icon: '🤖' },
+  { value: 'ollama', label: 'Ollama（本地部署）', icon: '💻' },
 ];
 
 const MODEL_OPTIONS: Record<AIProviderType, string[]> = {
-  claude: ['claude-sonnet-4-6', 'claude-opus-4-8', 'claude-haiku-4-5', 'claude-sonnet-4-5'],
-  openai: ['gpt-4o', 'gpt-4o-mini', 'gpt-4-turbo', 'deepseek-chat', 'deepseek-reasoner', 'qwen-plus'],
+  claude: ['claude-sonnet-4-6', 'claude-opus-4-8', 'claude-haiku-4-5'],
+  openai: ['gpt-4o', 'gpt-4o-mini', 'deepseek-chat', 'deepseek-reasoner', 'qwen-plus', 'qwen-max'],
   ollama: ['qwen2.5:7b', 'qwen2.5:14b', 'llama3.1:8b', 'mistral:7b', 'deepseek-r1:8b'],
 };
 
@@ -35,7 +35,7 @@ export function SettingsPage() {
     <div className="max-w-2xl mx-auto">
       <h1 className="text-2xl font-bold text-gray-900 mb-2">设置</h1>
       <p className="text-gray-500 text-sm mb-8">
-        配置 AI 服务提供商和 API Key
+        配置 AI 服务与常规选项
       </p>
 
       <div className="space-y-6">
@@ -64,11 +64,11 @@ export function SettingsPage() {
           </div>
         </div>
 
-        {/* API Key */}
+        {/* API 密钥 */}
         <div className="bg-white border border-gray-200 rounded-xl p-6">
           <div className="flex items-center gap-2 mb-4">
             <HiOutlineKey className="w-5 h-5 text-gray-500" />
-            <h2 className="font-semibold text-gray-800">API Key</h2>
+            <h2 className="font-semibold text-gray-800">API 密钥</h2>
           </div>
 
           <input
@@ -77,8 +77,8 @@ export function SettingsPage() {
             onChange={(e) => setApiKey(e.target.value)}
             placeholder={
               aiProvider.type === 'ollama'
-                ? 'Ollama 本地模型无需 API Key'
-                : '请输入你的 API Key...'
+                ? 'Ollama 本地部署无需密钥'
+                : `输入你的 ${aiProvider.type === 'claude' ? 'Claude' : 'OpenAI'} API 密钥...`
             }
             disabled={aiProvider.type === 'ollama'}
             className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg
@@ -87,13 +87,13 @@ export function SettingsPage() {
           />
         </div>
 
-        {/* 自定义 Base URL */}
+        {/* 自定义接口地址 */}
         {aiProvider.type !== 'claude' && (
           <div className="bg-white border border-gray-200 rounded-xl p-6">
             <div className="flex items-center gap-2 mb-4">
               <HiOutlineGlobeAlt className="w-5 h-5 text-gray-500" />
               <h2 className="font-semibold text-gray-800">
-                {aiProvider.type === 'ollama' ? 'Ollama 服务地址' : 'API Base URL（可选）'}
+                {aiProvider.type === 'ollama' ? 'Ollama 服务地址' : '自定义接口地址（可选）'}
               </h2>
             </div>
 
@@ -113,7 +113,7 @@ export function SettingsPage() {
             <p className="text-xs text-gray-400 mt-2">
               {aiProvider.type === 'ollama'
                 ? 'Ollama 默认运行在本地 11434 端口'
-                : '用于自定义 API 代理地址或兼容 OpenAI API 格式的第三方服务'}
+                : '可填入代理地址或兼容 OpenAI 格式的第三方服务地址'}
             </p>
           </div>
         )}
@@ -139,7 +139,7 @@ export function SettingsPage() {
             ))}
           </select>
 
-          {/* 自定义模型输入 */}
+          {/* 自定义模型 */}
           <div className="mt-3">
             <input
               type="text"
@@ -149,7 +149,7 @@ export function SettingsPage() {
                   : aiProvider.model
               }
               onChange={(e) => e.target.value && setModel(e.target.value)}
-              placeholder="或输入自定义模型名称..."
+              placeholder="或手动输入模型名称..."
               className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg
                          focus:border-primary-400 focus:ring-4 focus:ring-primary-50
                          outline-none text-sm"
@@ -157,7 +157,7 @@ export function SettingsPage() {
           </div>
         </div>
 
-        {/* 保存按钮 */}
+        {/* 保存 */}
         <button
           onClick={handleSave}
           className="w-full py-3 bg-primary-500 text-white rounded-xl font-medium
