@@ -44,7 +44,6 @@ export function InputPanel() {
         };
         setDone(parseResult);
 
-        // 开始生成笔记
         setIsGenerating(true);
         setGenerationProgress('正在生成康奈尔笔记...');
 
@@ -74,7 +73,7 @@ export function InputPanel() {
       }
 
       reset();
-      setParsing(0, '正在解析文件...');
+      setParsing(0, `正在解析文件: ${filePath}`);
 
       try {
         const result = await window.electronAPI.parseFile(filePath);
@@ -121,7 +120,7 @@ export function InputPanel() {
           }`}
         >
           <HiOutlineLink className="w-4 h-4" />
-          链接输入
+          粘贴链接
         </button>
         <button
           onClick={() => setInputMode('file')}
@@ -132,7 +131,7 @@ export function InputPanel() {
           }`}
         >
           <HiOutlineDocument className="w-4 h-4" />
-          文件上传
+          上传文件
         </button>
       </div>
 
@@ -144,13 +143,13 @@ export function InputPanel() {
       )}
 
       {/* 进度条 */}
-      {(status === 'parsing' || progressMessage) && (
+      {(status === 'parsing' || useNoteStore.getState().isGenerating) && (
         <ParseProgressBar />
       )}
 
       {/* 错误提示 */}
       {status === 'error' && (
-        <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+        <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm whitespace-pre-wrap">
           {useParseStore.getState().error}
         </div>
       )}
