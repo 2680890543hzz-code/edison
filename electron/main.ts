@@ -8,7 +8,6 @@ const __dirname = path.dirname(__filename);
 let mainWindow: BrowserWindow | null = null;
 
 function createWindow() {
-  // 获取主显示器的工作区尺寸，确保窗口在可见区域内
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width: screenW, height: screenH } = primaryDisplay.workAreaSize;
   const winW = Math.min(1400, screenW - 40);
