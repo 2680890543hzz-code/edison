@@ -1,0 +1,32 @@
+appId: com.cornell.ai-notes
+productName: AI康奈尔笔记
+copyright: Copyright © 2024
+
+directories:
+  output: release
+  buildResources: assets
+
+files:
+  - dist/**/*
+  - dist-electron/**/*
+
+win:
+  target:
+    - nsis
+  icon: assets/icons/icon.ico
+
+mac:
+  target:
+    - dmg
+  icon: assets/icons/icon.icns
+
+linux:
+  target:
+    - AppImage
+  icon: assets/icons/icon.png
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  installerIcon: assets/icons/icon.ico
+  uninstallerIcon: assets/icons/icon.ico
