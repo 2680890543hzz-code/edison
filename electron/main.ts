@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, screen } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -8,13 +8,23 @@ const __dirname = path.dirname(__filename);
 let mainWindow: BrowserWindow | null = null;
 
 function createWindow() {
+  // 获取主显示器的工作区尺寸，确保窗口在可见区域内
+  const primaryDisplay = screen.getPrimaryDisplay();
+  const { width: screenW, height: screenH } = primaryDisplay.workAreaSize;
+  const winW = Math.min(1400, screenW - 40);
+  const winH = Math.min(900, screenH - 40);
+  const winX = Math.max(0, Math.floor((screenW - winW) / 2));
+  const winY = Math.max(0, Math.floor((screenH - winH) / 2));
+
   mainWindow = new BrowserWindow({
-    width: 1400,
-    height: 900,
+    x: winX,
+    y: winY,
+    width: winW,
+    height: winH,
     minWidth: 1024,
     minHeight: 680,
     title: 'AI 康奈尔笔记',
-    show: false, // 先隐藏，ready-to-show 后再显示
+    show: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -23,7 +33,6 @@ function createWindow() {
     },
   });
 
-  // ready-to-show 后再显示，避免白屏闪烁
   mainWindow.once('ready-to-show', () => {
     mainWindow?.show();
     mainWindow?.focus();
