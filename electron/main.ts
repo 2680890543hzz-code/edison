@@ -14,12 +14,19 @@ function createWindow() {
     minWidth: 1024,
     minHeight: 680,
     title: 'AI 康奈尔笔记',
+    show: false, // 先隐藏，ready-to-show 后再显示
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: false,
     },
+  });
+
+  // ready-to-show 后再显示，避免白屏闪烁
+  mainWindow.once('ready-to-show', () => {
+    mainWindow?.show();
+    mainWindow?.focus();
   });
 
   if (process.env.VITE_DEV_SERVER_URL) {
