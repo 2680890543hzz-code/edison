@@ -87,10 +87,10 @@ export async function parseFileContent(
       const content = fs.readFileSync(input, 'utf-8');
       onProgress(100, '文本文件读取完成');
       return {
-        type: 'pdf',
+        type: 'pdf' as const,
         title: path.basename(input, ext),
         plainText: content,
-        metadata: { source: input, wordCount: content.length },
+        metadata: { source: input, wordCount: content.length, fileType: 'txt' },
         segments: segmentText(content),
       };
 
