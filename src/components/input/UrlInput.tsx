@@ -10,47 +10,29 @@ export function UrlInput({ onSubmit, disabled }: UrlInputProps) {
   const [url, setUrl] = useState('');
   const [error, setError] = useState('');
 
-  const validateUrl = (input: string): string | null => {
-    if (!input || !input.trim()) {
-      return '请输入链接地址';
-    }
-    const trimmed = input.trim();
-    // 标准URL
-    if (/^https?:\/\//.test(trimmed)) return null;
-    // B站短链
-    if (/^b23\.tv\//.test(trimmed)) return null;
-    // B站BV号
-    if (/^BV[A-Za-z0-9]{10}$/.test(trimmed)) return null;
-    // 常见域名
-    if (/^[\w.-]+\.(com|cn|org|net|io|tv|me|cc)\b/.test(trimmed)) return null;
-
-    return '请输入完整的链接地址（以 http:// 或 https:// 开头）';
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
     const trimmed = url.trim();
-    const validationError = validateUrl(trimmed);
 
-    if (validationError) {
-      setError(validationError);
+    if (!trimmed) {
+      setError('请输入链接地址');
       return;
     }
 
-    // B站BV号补全
+    // 非常宽松的验证——几乎什么都接受
+    // B站BV号 → 自动补全为完整链接
     let finalUrl = trimmed;
     if (/^BV[A-Za-z0-9]{10}$/.test(trimmed)) {
       finalUrl = `https://www.bilibili.com/video/${trimmed}`;
-    }
-    if (/^b23\.tv\//.test(trimmed)) {
+    } else if (/^b23\.tv\//.test(trimmed)) {
+      finalUrl = `https://${trimmed}`;
+    } else if (!/^https?:\/\//.test(trimmed)) {
       finalUrl = `https://${trimmed}`;
     }
-    if (!finalUrl.startsWith('http')) {
-      finalUrl = `https://${finalUrl}`;
-    }
 
+    console.log('UrlInput: 最终URL =', finalUrl);
     onSubmit(finalUrl);
   };
 
@@ -64,7 +46,7 @@ export function UrlInput({ onSubmit, disabled }: UrlInputProps) {
             setUrl(e.target.value);
             if (error) setError('');
           }}
-          placeholder="粘贴链接... 支持网页文章、B站视频、YouTube等"
+          placeholder="粘贴链接... 支持网页、B站、YouTube等 (必须以 http:// 或 https:// 开头)"
           disabled={disabled}
           className={`
             w-full px-5 py-4 pr-14 text-base bg-white border-2 rounded-xl

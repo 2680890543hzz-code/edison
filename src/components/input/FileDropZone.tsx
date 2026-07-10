@@ -7,17 +7,12 @@ interface FileDropZoneProps {
 }
 
 const SUPPORTED_CATEGORIES = [
-  { exts: ['.pdf'], label: 'PDF', icon: '📄' },
-  { exts: ['.docx', '.doc'], label: 'Word', icon: '📝' },
-  { exts: ['.txt', '.md', '.csv', '.json'], label: '文本', icon: '📃' },
-  { exts: ['.mp4', '.avi', '.mkv', '.mov', '.webm'], label: '视频', icon: '🎬' },
-  { exts: ['.mp3', '.wav', '.m4a', '.ogg'], label: '音频', icon: '🎵' },
+  { exts: ['.pdf'], label: 'PDF', icon: '��' },
+  { exts: ['.docx', '.doc'], label: 'Word', icon: '��' },
+  { exts: ['.txt', '.md', '.csv', '.json'], label: '文本', icon: '��' },
+  { exts: ['.mp4', '.avi', '.mkv', '.mov', '.webm'], label: '视频', icon: '��' },
+  { exts: ['.mp3', '.wav', '.m4a', '.ogg'], label: '音频', icon: '��' },
 ];
-
-// 实时获取 Electron 文件路径的辅助函数
-function getElectronFilePath(file: File): string {
-  return (file as any).path || file.name;
-}
 
 export function FileDropZone({ onFileDrop, disabled }: FileDropZoneProps) {
   const [isDragging, setIsDragging] = useState(false);
@@ -27,7 +22,6 @@ export function FileDropZone({ onFileDrop, disabled }: FileDropZoneProps) {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(true);
-    // Electron 中拖拽文件进来时 dataTransfer 已经有文件信息
     const items = Array.from(e.dataTransfer.files || []).map(f => f.name);
     setDragFiles(items);
   }, []);
@@ -50,23 +44,24 @@ export function FileDropZone({ onFileDrop, disabled }: FileDropZoneProps) {
 
       const files = e.dataTransfer.files;
       if (!files || files.length === 0) {
-        alert('未检测到文件。请确认已从文件管理器中拖拽文件到此处。');
+        alert('未检测到文件。请点击文件区域打开文件对话框选择文件。');
         return;
       }
 
       const file = files[0];
-      const filePath = getElectronFilePath(file);
-      console.log('FileDropZone: 拖拽文件路径 =', filePath);
+      // Electron 会给 File 对象附加 path 属性
+      const filePath: string | undefined = (file as any).path;
+      console.log('FileDropZone: 文件路径 =', filePath, '文件名 =', file.name);
 
-      if (!filePath || filePath === file.name) {
+      if (filePath) {
+        onFileDrop(filePath);
+      } else {
+        // 没有 path 属性，说明拖拽来源不是文件系统
         alert(
-          '无法获取文件完整路径，请点击此区域打开文件对话框选择文件。\n\n' +
-          '(拖拽文件时Electron需要获取文件的完整磁盘路径)'
+          '无法获取文件路径。\n\n' +
+          '请点击这个区域打开文件对话框来选择文件。'
         );
-        return;
       }
-
-      onFileDrop(filePath);
     },
     [disabled, onFileDrop]
   );
@@ -88,7 +83,7 @@ export function FileDropZone({ onFileDrop, disabled }: FileDropZoneProps) {
       ];
 
       const files = await window.electronAPI.openFileDialog({ filters });
-      console.log('FileDropZone: 文件对话框选择了 =', files);
+      console.log('FileDropZone: 对话框选择了 =', files);
 
       if (files && files.length > 0) {
         onFileDrop(files[0]);
@@ -146,10 +141,10 @@ export function FileDropZone({ onFileDrop, disabled }: FileDropZoneProps) {
         </>
       )}
 
-      {/* 提示信息 */}
+      {/* 提示 */}
       <div className="mt-4 flex items-center justify-center gap-1.5 text-xs text-gray-400">
         <HiOutlineExclamationTriangle className="w-3.5 h-3.5" />
-        <span>如果拖拽文件无反应，请点击此区域打开文件对话框</span>
+        <span>拖拽失败时请点击此区域选择文件</span>
       </div>
     </div>
   );

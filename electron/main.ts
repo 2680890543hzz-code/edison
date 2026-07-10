@@ -67,6 +67,7 @@ app.whenReady().then(async () => {
 
   createWindow();
 
+  // macOS 特有的激活行为
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();
